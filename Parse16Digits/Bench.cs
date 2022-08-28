@@ -26,6 +26,20 @@ public class Bench
         {
             throw new Exception(Result.ToString());
         }
+
+        Result = Instance.Atoi();
+        
+        if (Result != 1234567812345678)
+        {
+            throw new Exception(Result.ToString());
+        }
+        
+        Result = Instance.Atoi2();
+        
+        if (Result != 1234567812345678)
+        {
+            throw new Exception(Result.ToString());
+        }
     }
 
     public const string ID = "1234567812345678";
@@ -35,39 +49,39 @@ public class Bench
     {
         var Span = ID.AsSpan();
 
-        ref var Current = ref MemoryMarshal.GetReference(Span);
+        ref var First = ref MemoryMarshal.GetReference(Span);
 
-        var E0 = (ulong) (Current - '0');
+        var E0 = (ulong) (First - '0') * 1_000_000_000_000_000;
         
-        var E1 = (ulong) (Unsafe.Add(ref Current, 1) - '0') * 10;
+        var E1 = (ulong) (Unsafe.Add(ref First, 1) - '0') * 100_000_000_000_000;
         
-        var E2 = (ulong) (Unsafe.Add(ref Current, 2) - '0') * 100;
+        var E2 = (ulong) (Unsafe.Add(ref First, 2) - '0') * 10_000_000_000_000;
         
-        var E3 = (ulong) (Unsafe.Add(ref Current, 3) - '0') * 1000;
+        var E3 = (ulong) (Unsafe.Add(ref First, 3) - '0') * 1_000_000_000_000;
         
-        var E4 = (ulong) (Unsafe.Add(ref Current, 4) - '0') * 10_000;
+        var E4 = (ulong) (Unsafe.Add(ref First, 4) - '0') * 100_000_000_000;
         
-        var E5 = (ulong) (Unsafe.Add(ref Current, 5) - '0') * 100_000;
+        var E5 = (ulong) (Unsafe.Add(ref First, 5) - '0') * 10_000_000_000;
         
-        var E6 = (ulong) (Unsafe.Add(ref Current, 6) - '0') * 1_000_000;
+        var E6 = (ulong) (Unsafe.Add(ref First, 6) - '0') * 1_000_000_000;
         
-        var E7 = (ulong) (Unsafe.Add(ref Current, 7) - '0') * 10_000_000;
+        var E7 = (ulong) (Unsafe.Add(ref First, 7) - '0') * 100_000_000;
         
-        var E8 = (ulong) (Unsafe.Add(ref Current, 8) - '0') * 100_000_000;
+        var E8 = (ulong) (Unsafe.Add(ref First, 8) - '0') * 10_000_000;
         
-        var E9 = (ulong) (Unsafe.Add(ref Current, 9) - '0') * 1_000_000_000;
+        var E9 = (ulong) (Unsafe.Add(ref First, 9) - '0') * 1_000_000;
         
-        var E10 = (ulong) (Unsafe.Add(ref Current, 10) - '0') * 10_000_000_000;
+        var E10 = (ulong) (Unsafe.Add(ref First, 10) - '0') * 100_000;
         
-        var E11 = (ulong) (Unsafe.Add(ref Current, 11) - '0') * 100_000_000_000;
+        var E11 = (ulong) (Unsafe.Add(ref First, 11) - '0') * 10_000;
         
-        var E12 = (ulong) (Unsafe.Add(ref Current, 12) - '0') * 1_000_000_000_000;
+        var E12 = (ulong) (Unsafe.Add(ref First, 12) - '0') * 1000;
         
-        var E13 = (ulong) (Unsafe.Add(ref Current, 13) - '0') * 10_000_000_000_000;
+        var E13 = (ulong) (Unsafe.Add(ref First, 13) - '0') * 100;
         
-        var E14 = (ulong) (Unsafe.Add(ref Current, 14) - '0') * 100_000_000_000_000;
+        var E14 = (ulong) (Unsafe.Add(ref First, 14) - '0') * 10;
         
-        var E15 = (ulong) (Unsafe.Add(ref Current, 15) - '0') * 1_000_000_000_000_000;
+        var E15 = (ulong) (Unsafe.Add(ref First, 15) - '0');
 
         return E0 + E1 + E2 + E3 + E4 + E5 + E6 + E7 + E8 + E9 + E10 + E11 + E12 + E13 + E14 + E15;
     }
@@ -89,10 +103,12 @@ public class Bench
 
         ulong Accumulator = 0;
         
-        for (;; Current = ref Unsafe.Add(ref Current, 1), Accumulator *= 10)
+        for (;; Accumulator *= 10)
         {
             Accumulator += (ulong) (Current - '0');
 
+            Current = ref Unsafe.Add(ref Current, 1);
+            
             if (Unsafe.AreSame(ref Current, ref LastOffsetbyOne))
             {
                 break;
